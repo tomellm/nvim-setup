@@ -48,9 +48,30 @@ vim.keymap.set("n", "<leader><leader>", function()
     vim.cmd("so")
 end)
 
-vim.keymap.set("n", "<C-b>", "<cmd>tabnew<CR>")
-vim.keymap.set("n", "<C-x>", "<cmd>tabc<CR>")
-vim.keymap.set("n", "<C-p>", "<cmd>tabl<CR>")
-vim.keymap.set("n", "<C-ü>", "<cmd>tabr<CR>")
-vim.keymap.set("n", "<C-ö>", "<cmd>tabp<CR>")
-vim.keymap.set("n", "<C-ä>", "<cmd>tabn<CR>")
+-- buffer management
+vim.keymap.set("n", "<leader>bn", "<cmd>bnext<CR>")
+vim.keymap.set("n", "<leader>bp", "<cmd>bprev<CR>")
+vim.keymap.set("n", "<leader>bd", "<cmd>bdelete<CR>")
+vim.keymap.set("n", "<leader>bl", "<cmd>ls<CR>")
+vim.keymap.set("n", "<leader>bw", "<cmd>w<CR>")
+vim.keymap.set("n", "<leader>bq", "<cmd>q<CR>")
+
+-- window management
+vim.keymap.set("n", "<leader>wh", "<cmd>split<CR>")
+vim.keymap.set("n", "<leader>wv", "<cmd>vsplit<CR>")
+vim.keymap.set("n", "<leader>wn", "<cmd>new<CR>")
+vim.keymap.set("n", "<leader>wm", "<cmd>vnew<CR>")
+vim.keymap.set("n", "<leader>wc", "<cmd>close<CR>")
+vim.keymap.set("n", "<leader>wg", "<cmd>hide<CR>")
+
+-- window resizing
+vim.keymap.set("n", "<leader><Right>", "<C-W>>5")
+vim.keymap.set("n", "<leader><Left>", "<C-W><5")
+vim.keymap.set("n", "<leader><Up>", "<C-W>+5")
+vim.keymap.set("n", "<leader><Down>", "<C-W>-5")
+
+-- tab management
+vim.keymap.set("n", "<leader>tc", "<cmd>tabnew<CR>")
+vim.keymap.set("n", "<leader>td", "<cmd>tabclose<CR>")
+vim.keymap.set("n", "<leader>tn", "<cmd>tabnext<CR>")
+vim.keymap.set("n", "<leader>tp", "<cmd>tabnprevious<CR>")
