@@ -55,6 +55,7 @@ vim.keymap.set("n", "<leader>bd", "<cmd>bdelete<CR>")
 vim.keymap.set("n", "<leader>bl", "<cmd>ls<CR>")
 vim.keymap.set("n", "<leader>bw", "<cmd>w<CR>")
 vim.keymap.set("n", "<leader>bq", "<cmd>q<CR>")
+vim.keymap.set("n", "<leader>bs", "<cmd>w<CR>")
 
 -- window management
 vim.keymap.set("n", "<leader>wh", "<cmd>split<CR>")
