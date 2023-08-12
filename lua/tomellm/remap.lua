@@ -76,3 +76,5 @@ vim.keymap.set("n", "<leader>tc", "<cmd>tabnew<CR>")
 vim.keymap.set("n", "<leader>td", "<cmd>tabclose<CR>")
 vim.keymap.set("n", "<leader>tn", "<cmd>tabnext<CR>")
 vim.keymap.set("n", "<leader>tp", "<cmd>tabnprevious<CR>")
+
+vim.keymap.set("n", "<leader>e", "<cmd>lua vim.diagnostic.open_float()<CR>")
