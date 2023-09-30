@@ -1,4 +1,4 @@
-
+vim.keymap.set("n", "qq", "")
 vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
@@ -77,4 +77,26 @@ vim.keymap.set("n", "<leader>td", "<cmd>tabclose<CR>")
 vim.keymap.set("n", "<leader>tn", "<cmd>tabnext<CR>")
 vim.keymap.set("n", "<leader>tp", "<cmd>tabnprevious<CR>")
 
+-- error management
 vim.keymap.set("n", "<leader>e", "<cmd>lua vim.diagnostic.open_float()<CR>")
+
+
+-- DB commandos
+
+vim.keymap.set("n", "<leader>qt", "<cmd>DBUIToggle<CR>")
+
+
+-- Greek letters
+
+vim.keymap.set("i", "<C-g>g", "<C-k>g*") -- gamma
+vim.keymap.set("i", "<C-g>d", "<C-k>d*") -- delta
+vim.keymap.set("i", "<C-g>h", "<C-k>h*") -- theta
+vim.keymap.set("i", "<C-g>p", "<C-k>p*") -- pi 
+vim.keymap.set("i", "<C-g>s", "<C-k>s*") -- sigma
+vim.keymap.set("i", "<C-g>f", "<C-k>f*") -- phi
+vim.keymap.set("i", "<C-g>w", "<C-k>w*") -- omega
+vim.keymap.set("i", "<C-g>q", "<C-k>q*") -- psi
+vim.keymap.set("i", "<C-g>a", "<C-k>a*") -- alpha 
+vim.keymap.set("i", "<C-g>b", "<C-k>b*") -- beta
+
+

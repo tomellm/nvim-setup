@@ -31,12 +31,22 @@ return require('packer').startup(function(use)
 
 	use( 'tpope/vim-fugitive' )
 
+    use( 'tpope/vim-dadbod' )
+    use( 'kristijanhusak/vim-dadbod-ui')
+    use( 'kristijanhusak/vim-dadbod-completion')
+
+    use {'jghauser/fold-cycle.nvim',
+        config = function()
+            require('fold-cycle').setup()
+        end
+    }
+
 	use {
 	 	 'VonHeikemen/lsp-zero.nvim',
 	 	 branch = 'v2.x',
  		 requires = {
    			 -- LSP Support
-  			{'neovim/nvim-lspconfig'},       
+  			{'neovim/nvim-lspconfig'},
 			{'williamboman/mason.nvim'},
 			{'williamboman/mason-lspconfig.nvim'},
 
@@ -46,7 +56,7 @@ return require('packer').startup(function(use)
 			{'hrsh7th/cmp-path'},
 			{'saadparwaiz1/cmp_luasnip'},
 			{'hrsh7th/cmp-nvim-lsp'}, -- Required
-			{'hrsh7th/cmp-nvim-lua'}, 
+			{'hrsh7th/cmp-nvim-lua'},
 			{'L3MON4D3/LuaSnip'},     -- Required
 			{'rafamadriz/friendly-snippets'},
   		}
