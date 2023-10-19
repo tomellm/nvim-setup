@@ -98,5 +98,7 @@ vim.keymap.set("i", "<C-g>w", "<C-k>w*") -- omega
 vim.keymap.set("i", "<C-g>q", "<C-k>q*") -- psi
 vim.keymap.set("i", "<C-g>a", "<C-k>a*") -- alpha 
 vim.keymap.set("i", "<C-g>b", "<C-k>b*") -- beta
-
+vim.keymap.set("i", "<C-g>e", "<C-k>e*") -- epsilon
+vim.keymap.set("i", "<C-g>l", "<C-k>l*") -- lambda
+vim.keymap.set("i", "<C-g>t", "<C-k>t*") -- tau
 
