@@ -13,10 +13,10 @@ return require('packer').startup(function(use)
   		requires = { {'nvim-lua/plenary.nvim'} }
 	}
 
-	use({ 
+	use({
 		"ellisonleao/gruvbox.nvim",
 		as = "gruvbox",
-		config = function() 
+		config = function()
 			vim.cmd("colorscheme gruvbox");
 		end
 	})
@@ -35,11 +35,6 @@ return require('packer').startup(function(use)
     use( 'kristijanhusak/vim-dadbod-ui')
     use( 'kristijanhusak/vim-dadbod-completion')
 
-    use {'jghauser/fold-cycle.nvim',
-        config = function()
-            require('fold-cycle').setup()
-        end
-    }
 
 	use {
 	 	 'VonHeikemen/lsp-zero.nvim',
@@ -61,4 +56,10 @@ return require('packer').startup(function(use)
 			{'rafamadriz/friendly-snippets'},
   		}
 	}
+
+    -- install without yarn or npm
+    use({
+        "iamcco/markdown-preview.nvim",
+        run = function() vim.fn["mkdp#util#install"]() end,
+    })
 end)

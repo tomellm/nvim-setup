@@ -102,3 +102,6 @@ vim.keymap.set("i", "<C-g>e", "<C-k>e*") -- epsilon
 vim.keymap.set("i", "<C-g>l", "<C-k>l*") -- lambda
 vim.keymap.set("i", "<C-g>t", "<C-k>t*") -- tau
 
+
+-- Markdown Preview
+vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreviewToggle<CR>")
