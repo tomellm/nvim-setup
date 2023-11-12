@@ -18,6 +18,7 @@ vim.keymap.set("n", "<leader>svwm", function ()
 end)
 
 
+vim.keymap.set("n", "<leader>p", "\"_dP")
 vim.keymap.set("x", "<leader>p", "\"_dP")
 
 
