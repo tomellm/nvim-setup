@@ -47,9 +47,16 @@ local diagnostics = {
 
 local lspstatus = {
     function ()
-        return require('lsp-status').status():sub(6)
+        return string.sub(require('lsp-status').status():sub(6), -50, -1)
     end,
-    icons_enabled = false 
+    icons_enabled = false
+}
+
+local filename = {
+    "filename",
+    fmt = function(str)
+        return vim.fn.expand('%')
+    end
 }
 
 require('lualine').setup {
@@ -74,7 +81,7 @@ require('lualine').setup {
     sections = {
         lualine_a = { { 'mode', fmt = function(str) return string.lower(str) end } },
         lualine_b = { branch, diagnostics },
-        lualine_c = { 'filename' },
+        lualine_c = { filename },
         lualine_x = { 'filetype' },
         lualine_y = { 'progress' },
         lualine_z = { 'location', lspstatus }
@@ -82,7 +89,7 @@ require('lualine').setup {
     inactive_sections = {
         lualine_a = {},
         lualine_b = { branch, diagnostics },
-        lualine_c = { 'filename' },
+        lualine_c = { filename },
         lualine_x = { 'filetype' },
         lualine_y = {},
         lualine_z = { 'location' }
