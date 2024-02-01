@@ -71,7 +71,7 @@ require('lualine').setup {
         },
         ignore_focus = {},
         always_divide_middle = true,
-        globalstatus = true,
+        globalstatus = false,
         refresh = {
             statusline = 1000,
             tabline = 1000,
@@ -88,11 +88,11 @@ require('lualine').setup {
     },
     inactive_sections = {
         lualine_a = {},
-        lualine_b = { branch, diagnostics },
+        lualine_b = {},
         lualine_c = { filename },
-        lualine_x = { 'filetype' },
+        lualine_x = {},
         lualine_y = {},
-        lualine_z = { 'location' }
+        lualine_z = {}
     },
     tabline = {},
     winbar = {},

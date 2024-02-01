@@ -125,6 +125,11 @@ _G.packer_plugins = {
     path = "/Users/tomellm/.local/share/nvim/site/pack/packer/start/harpoon",
     url = "https://github.com/ThePrimeagen/harpoon"
   },
+  ["jupynium.nvim"] = {
+    loaded = true,
+    path = "/Users/tomellm/.local/share/nvim/site/pack/packer/start/jupynium.nvim",
+    url = "https://github.com/kiyoon/jupynium.nvim"
+  },
   ["lsp-status.nvim"] = {
     loaded = true,
     path = "/Users/tomellm/.local/share/nvim/site/pack/packer/start/lsp-status.nvim",
