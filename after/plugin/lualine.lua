@@ -80,11 +80,11 @@ require('lualine').setup {
     },
     sections = {
         lualine_a = { { 'mode', fmt = function(str) return string.lower(str) end } },
-        lualine_b = { branch, diagnostics },
+        lualine_b = { branch },
         lualine_c = { filename },
         lualine_x = { 'filetype' },
-        lualine_y = { 'progress' },
-        lualine_z = { 'location', lspstatus }
+        lualine_y = {},
+        lualine_z = {lspstatus }
     },
     inactive_sections = {
         lualine_a = {},
