@@ -1,4 +1,4 @@
-function ColorMyPencils(color)
+--[[function ColorMyPencils(color)
 	color = color or "gruvbox"
 	vim.cmd.colorscheme(color)
 
@@ -6,4 +6,7 @@ function ColorMyPencils(color)
 	vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 end
 
-ColorMyPencils()
+ColorMyPencils()]]
+
+vim.o.background = "dark" -- or "light" for light mode
+vim.cmd([[colorscheme gruvbox]])

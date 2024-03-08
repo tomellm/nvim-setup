@@ -1,4 +1,4 @@
-local lsp = require("lsp-zero").preset({})
+local lsp = require("lsp-zero")
 
 lsp.preset("recommended")
 
@@ -10,24 +10,35 @@ lsp.setup_servers({
 })
 
 local cmp = require('cmp')
+local cmp_action = require('lsp-zero').cmp_action()
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
-local cmp_mappings = lsp.defaults.cmp_mappings({
-    ['<C-y>'] = cmp.mapping.confirm({ select = true }),
-    ['<C-Space>'] = cmp.mapping.complete(),
-})
-
-
 --------- Stuff for Jupyter Notebook plugin
 --------- https://github.com/kiyoon/jupynium.nvim
 
 local compare = cmp.config.compare
 
-cmp.setup {
+cmp.setup({
     sources = {
         { name = "jupynium", priority = 1000 }, -- consider higher priority than LSP
         { name = "nvim_lsp", priority = 100 },
+        { name = 'luasnip' },
         -- ...
     },
+    snippet = {
+        expand = function(args)
+            luasnip.lsp_expand(args.body)
+        end,
+    },
+    window = {
+        completion = cmp.config.window.bordered(),
+        documentation = cmp.config.window.bordered(),
+    },
+    mapping = cmp.mapping.preset.insert({
+        ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+        ['<C-Space>'] = cmp.mapping.complete(),
+        ['<C-f>'] = cmp_action.luasnip_jump_forward(),
+        ['<C-b>'] = cmp_action.luasnip_jump_backward()
+    }),
     sorting = {
         priority_weight = 1.0,
         comparators = {
@@ -37,7 +48,7 @@ cmp.setup {
             -- ...
         },
     },
-}
+})
 
 ---------
 
@@ -45,9 +56,9 @@ lsp.set_preferences({
     sign_icons = {}
 })
 
-lsp.setup_nvim_cmp({
+--[[lsp.setup_nvim_cmp({
     mapping = cmp_mappings
-})
+})]]
 
 lsp.on_attach(function(client, bufnr)
     lsp.default_keymaps({ buffer = bufnr })
@@ -78,9 +89,5 @@ nvim_lsp.rust_analyzer.setup {
         },
     }
 }
-
-
-
-
 
 lsp.setup()
