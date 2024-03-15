@@ -79,8 +79,11 @@ vim.keymap.set("n", "<leader>tn", "<cmd>tabnext<CR>")
 vim.keymap.set("n", "<leader>tp", "<cmd>tabnprevious<CR>")
 
 -- error management
-vim.keymap.set("n", "<leader>e", "<cmd>lua vim.diagnostic.open_float()<CR>")
+vim.keymap.set("n", "<leader>ee", "<cmd>lua vim.diagnostic.open_float()<CR>")
 
+vim.keymap.set("n", "<leader>ea", function ()
+    require('telescope.builtin').diagnostics({ sort_by = "severity" })
+end)
 
 -- DB commandos
 
@@ -106,3 +109,7 @@ vim.keymap.set("i", "<C-g>t", "<C-k>t*") -- tau
 
 -- Markdown Preview
 vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreviewToggle<CR>")
+
+
+-- count words
+vim.keymap.set("n", "<leader>cr", "<cmd>!find . -name '*.rs' -type f -exec wc -l {} +<CR>")

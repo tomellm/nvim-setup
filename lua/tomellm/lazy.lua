@@ -3,14 +3,12 @@ require('lazy').setup({
         'nvim-telescope/telescope.nvim',
         tag = '0.1.4',
         dependencies = { { 'nvim-lua/plenary.nvim' } }
-    },
-    { 
+    },{ 
         "ellisonleao/gruvbox.nvim",
         priority = 1000 , 
         config = true, 
         opts = ...
-    },
-    { 
+    },{ 
         'nvim-treesitter/nvim-treesitter',
         build = ':TSUpdate'
     },
@@ -37,14 +35,12 @@ require('lazy').setup({
         branch = 'v3.x',
         lazy = true,
         config = false,
-    },
-    { 
+    },{
         'neovim/nvim-lspconfig',
         dependencies = {
-            { 'hrsh7th/cmp-nvim-lsp' }
+            'hrsh7th/cmp-nvim-lsp'
         }
-    },
-    { 
+    },{
         'hrsh7th/nvim-cmp',
         version = false, -- last release is way too old
         event = "InsertEnter",
@@ -52,17 +48,20 @@ require('lazy').setup({
             "hrsh7th/cmp-nvim-lsp",
             "hrsh7th/cmp-buffer",
             "hrsh7th/cmp-path",
+            'saadparwaiz1/cmp_luasnip'
           },
     },
-    
-
-
     'hrsh7th/cmp-buffer',
     'hrsh7th/cmp-path',
-    'saadparwaiz1/cmp_luasnip',
     'hrsh7th/cmp-nvim-lua',
+    {
+        "L3MON4D3/LuaSnip",
+        -- follow latest release.
+        version = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+        -- install jsregexp (optional!).
+        build = "make install_jsregexp"
+    },
     'rafamadriz/friendly-snippets',
-    "rafamadriz/friendly-snippets",
     
     -- install without yarn or npm
     {
