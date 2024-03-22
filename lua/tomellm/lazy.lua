@@ -3,15 +3,15 @@ require('lazy').setup({
         'nvim-telescope/telescope.nvim',
         tag = '0.1.4',
         dependencies = { { 'nvim-lua/plenary.nvim' } }
-    },{ 
-        "ellisonleao/gruvbox.nvim",
-        priority = 1000 , 
-        config = true, 
-        opts = ...
-    },{ 
-        'nvim-treesitter/nvim-treesitter',
-        build = ':TSUpdate'
-    },
+    }, {
+    "ellisonleao/gruvbox.nvim",
+    priority = 1000,
+    config = true,
+    opts = ...
+}, {
+    'nvim-treesitter/nvim-treesitter',
+    build = ':TSUpdate'
+},
 
     'nvim-treesitter/playground',
 
@@ -35,22 +35,22 @@ require('lazy').setup({
         branch = 'v3.x',
         lazy = true,
         config = false,
-    },{
-        'neovim/nvim-lspconfig',
-        dependencies = {
-            'hrsh7th/cmp-nvim-lsp'
-        }
-    },{
-        'hrsh7th/nvim-cmp',
-        version = false, -- last release is way too old
-        event = "InsertEnter",
-        dependencies = {
-            "hrsh7th/cmp-nvim-lsp",
-            "hrsh7th/cmp-buffer",
-            "hrsh7th/cmp-path",
-            'saadparwaiz1/cmp_luasnip'
-          },
+    }, {
+    'neovim/nvim-lspconfig',
+    dependencies = {
+        'hrsh7th/cmp-nvim-lsp'
+    }
+}, {
+    'hrsh7th/nvim-cmp',
+    version = false,     -- last release is way too old
+    event = "InsertEnter",
+    dependencies = {
+        "hrsh7th/cmp-nvim-lsp",
+        "hrsh7th/cmp-buffer",
+        "hrsh7th/cmp-path",
+        'saadparwaiz1/cmp_luasnip'
     },
+},
     'hrsh7th/cmp-buffer',
     'hrsh7th/cmp-path',
     'hrsh7th/cmp-nvim-lua',
@@ -62,7 +62,7 @@ require('lazy').setup({
         build = "make install_jsregexp"
     },
     'rafamadriz/friendly-snippets',
-    
+
     -- install without yarn or npm
     {
         "iamcco/markdown-preview.nvim",
@@ -89,4 +89,8 @@ require('lazy').setup({
     {
         "kiyoon/jupynium.nvim", build = "pip3 install --user ."
     },
+    {
+        "luckasRanarison/tailwind-tools.nvim",
+        opts = {} -- your configuration
+    }
 })
