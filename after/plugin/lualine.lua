@@ -46,8 +46,13 @@ local diagnostics = {
 }
 
 local lspstatus = {
-    function ()
-        return string.sub(require('lsp-status').status():sub(6), -50, -1)
+    function()
+        --return string.sub(require('lsp-status').status():sub(6), -50, -1)
+        if vim.lsp.buf_get_clients() > 0 then
+            return require('lsp-status').status()
+        else
+          return ''
+        end
     end,
     icons_enabled = false
 }
@@ -62,7 +67,7 @@ local filename = {
 require('lualine').setup {
     options = {
         icons_enabled = true,
-        theme = 'gruvbox',
+        --theme = 'gruvbox',
         component_separators = { left = '', right = '' },
         section_separators = { left = '', right = '' },
         disabled_filetypes = {
@@ -84,7 +89,7 @@ require('lualine').setup {
         lualine_c = { filename },
         lualine_x = { 'filetype' },
         lualine_y = {},
-        lualine_z = {lspstatus }
+        lualine_z = { lspstatus }
     },
     inactive_sections = {
         lualine_a = {},
