@@ -8,8 +8,6 @@ end
 
 local luasnip = require('luasnip')
 
-lsp.preset("recommended")
-
 lsp.setup_servers({
     'ts_ls',
     'eslint',
@@ -19,7 +17,7 @@ lsp.setup_servers({
 
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()
-local cmp_select = { behavior = cmp.SelectBehavior.Select }
+-- local cmp_select = { behavior = cmp.SelectBehavior.Select }
 --------- Stuff for Jupyter Notebook plugin
 --------- https://github.com/kiyoon/jupynium.nvim
 
@@ -31,6 +29,10 @@ local get_ws = function(max, len)
 end
 
 local format = function(_, item)
+    if item.menu == nil then
+        return item
+    end
+
     local ELLIPSIS_CHAR = '…'
     local MAX_LABEL_WIDTH = 30
     local menu = item.menu
@@ -97,16 +99,13 @@ cmp.setup({
             -- ...
         },
     },
+    ---@class cmp.FormattingConfig
     formatting = {
         format = format
     }
 })
 
 ---------
-
-lsp.set_preferences({
-    sign_icons = {}
-})
 
 --[[lsp.setup_nvim_cmp({
     mapping = cmp_mappings
@@ -129,7 +128,6 @@ lsp.on_attach(function(client, bufnr)
     vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
 end)
 
-local nvim_lsp = require('lspconfig')
 local M = {}
 
 local lsp_format = require('lsp-format')
@@ -158,37 +156,18 @@ local function set_commands()
     vim.cmd('command! LspWorkspaceRemove lua vim.lsp.buf.remove_workspace_folder()')
 end
 
-local function set_keymaps(bufnr)
-    wk.register({
-        g = {
-            name = 'LSP goto',
-            d = { '<cmd>Telescope lsp_definitions<CR>', 'definitions' },
-            D = { '<cmd>LspTypeDef<CR>', 'type definition' },
-            L = { '<cmd>LspDeclaration<CR>', 'declaration' },
-            i = { '<cmd>Telescope lsp_implementations<CR>', 'implementations' },
-            r = { '<cmd>Telescope lsp_references<CR>', 'references' },
-        },
-        c = {
-            name = 'LSP code changes',
-            a = { '<cmd>CodeActionMenu<CR>', 'code actions' },
-            f = { '<cmd>Format<CR>', 'format' },
-            r = { '<cmd>LspRename<CR>', 'rename variable' },
-        },
-    }, {
-        prefix = '<leader>',
-        buffer = bufnr,
-    })
-    wk.register({
-        K = { '<cmd>LspHover<CR>', 'LSP hover' },
-        ['<C-S>'] = { '<cmd>LspSignatureHelp<CR>', 'LSP signature help' },
-    }, {
-        buffer = bufnr,
-    })
-    wk.register({
-        ['<C-S>'] = { '<cmd>LspSignatureHelp<CR>', 'LSP signature help' },
-    }, {
-        mode = 'i',
-        buffer = bufnr,
+local function set_keymaps()
+    wk.add({
+        { '<leader>gd', '<cmd>Telescope lsp_definitions<CR>',     desc = 'definitions' },
+        { '<leader>gD', '<cmd>LspTypeDef<CR>',                    desc = 'type definition' },
+        { '<leader>gL', '<cmd>LspDeclaration<CR>',                desc = 'declaration' },
+        { '<leader>gi', '<cmd>Telescope lsp_implementations<CR>', desc = 'implementations' },
+        { '<leader>gr', '<cmd>Telescope lsp_references<CR>',      desc = 'references' },
+        { '<leader>ca', '<cmd>CodeActionMenu<CR>',                desc = 'code actions' },
+        { '<leader>cf', '<cmd>Format<CR>',                        desc = 'format' },
+        { '<leader>cr', '<cmd>LspRename<CR>',                     desc = 'rename variable' },
+        { '<leader>K',  '<cmd>LspHover<CR>',                      desc = 'LSP hover' },
+        { '<C-S>',      '<cmd>LspSignatureHelp<CR>',              desc = 'LSP signature help',  mode = 'i' },
     })
 end
 
@@ -206,12 +185,13 @@ function M.on_attach_no_format(client, bufnr)
     vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
     set_commands()
-    set_keymaps(bufnr)
+    set_keymaps()
     illuminate.on_attach(client)
 
     vim.b.lsp_buffer_set_up = 1
 end
 
+local nvim_lsp = require('lspconfig')
 nvim_lsp.pyright.setup({
     capabilities = M.capabilities,
     on_attach = M.on_attach,
