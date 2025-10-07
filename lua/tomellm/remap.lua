@@ -10,10 +10,10 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 
-vim.keymap.set("n", "<leader>vwm", function ()
+vim.keymap.set("n", "<leader>vwm", function()
     require("vim-with-me").StartVimWithMe()
 end)
-vim.keymap.set("n", "<leader>svwm", function ()
+vim.keymap.set("n", "<leader>svwm", function()
     require("vim-with-me").StartVimWithMe()
 end)
 
@@ -33,7 +33,11 @@ vim.keymap.set("v", "<leader>d", "\"_d")
 
 vim.keymap.set("n", "Q", "<nop>")
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
-vim.keymap.set("n", "<leader>f", function ()
+vim.keymap.set("n", "<leader>f", function()
+    if vim.bo.filetype == 'java'
+    then
+        require('jdtls').organize_imports()
+    end
     vim.lsp.buf.format()
 end)
 
@@ -79,9 +83,11 @@ vim.keymap.set("n", "<leader>tn", "<cmd>tabnext<CR>")
 vim.keymap.set("n", "<leader>tp", "<cmd>tabnprevious<CR>")
 
 -- error management
-vim.keymap.set("n", "<leader>ee", "<cmd>lua vim.diagnostic.open_float()<CR>")
+vim.keymap.set("n", "<leader>ee", function()
+    vim.diagnostic.open_float()
+end)
 
-vim.keymap.set("n", "<leader>ea", function ()
+vim.keymap.set("n", "<leader>ea", function()
     require('telescope.builtin').diagnostics({ sort_by = "severity" })
 end)
 
@@ -95,12 +101,12 @@ vim.keymap.set("n", "<leader>qt", "<cmd>DBUIToggle<CR>")
 vim.keymap.set("i", "<C-g>g", "<C-k>g*") -- gamma
 vim.keymap.set("i", "<C-g>d", "<C-k>d*") -- delta
 vim.keymap.set("i", "<C-g>h", "<C-k>h*") -- theta
-vim.keymap.set("i", "<C-g>p", "<C-k>p*") -- pi 
+vim.keymap.set("i", "<C-g>p", "<C-k>p*") -- pi
 vim.keymap.set("i", "<C-g>s", "<C-k>s*") -- sigma
 vim.keymap.set("i", "<C-g>f", "<C-k>f*") -- phi
 vim.keymap.set("i", "<C-g>w", "<C-k>w*") -- omega
 vim.keymap.set("i", "<C-g>q", "<C-k>q*") -- psi
-vim.keymap.set("i", "<C-g>a", "<C-k>a*") -- alpha 
+vim.keymap.set("i", "<C-g>a", "<C-k>a*") -- alpha
 vim.keymap.set("i", "<C-g>b", "<C-k>b*") -- beta
 vim.keymap.set("i", "<C-g>e", "<C-k>e*") -- epsilon
 vim.keymap.set("i", "<C-g>l", "<C-k>l*") -- lambda

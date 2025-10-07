@@ -48,7 +48,7 @@ local diagnostics = {
 local lspstatus = {
     function()
         --return string.sub(require('lsp-status').status():sub(6), -50, -1)
-        if vim.lsp.buf_get_clients() > 0 then
+        if vim.lsp.get_clients() > 0 then
             return require('lsp-status').status()
         else
           return ''

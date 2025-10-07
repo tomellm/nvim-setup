@@ -7,10 +7,17 @@ dap.adapters.lldb = {
 }
 
 
-vim.keymap.set('n', '<leader>dn', "<cmd>DapNew<CR>");
+vim.keymap.set('n', '<leader>dn', function()
+    if vim.bo.filetype == 'rust'
+    then
+        vim.cmd.RustLsp { 'debuggables' };
+    else
+        vim.cmd("DapNew");
+    end
+end);
 vim.keymap.set('n', '<leader>dx', "<cmd>DapTerminate<CR>");
 
-vim.keymap.set('n', '<leader>dc', "<cmd>DapConttinue<CR>");
+vim.keymap.set('n', '<leader>dc', "<cmd>DapContinue<CR>");
 vim.keymap.set('n', '<leader>dsi', "<cmd>DapStepInto<CR>");
 vim.keymap.set('n', '<leader>dso', "<cmd>DapStepOut<CR>");
 vim.keymap.set('n', '<leader>dsv', "<cmd>DapStepOver<CR>");

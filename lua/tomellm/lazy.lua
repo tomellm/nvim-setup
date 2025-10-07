@@ -32,7 +32,7 @@ local PLUGINS = {
     -- AUTOCOMPLETION
     {
         'hrsh7th/nvim-cmp',
-        version = false,     -- last release is way too old
+        version = false, -- last release is way too old
         event = "InsertEnter",
         dependencies = {
             "hrsh7th/cmp-nvim-lsp",
@@ -44,7 +44,7 @@ local PLUGINS = {
             opts.sources = opts.sources or {}
             table.insert(opts.sources, {
                 name = "lazydev",
-                group_index = 0,     -- set group index to 0 to skip loading LuaLS completions
+                group_index = 0, -- set group index to 0 to skip loading LuaLS completions
             })
         end,
     },
@@ -59,7 +59,7 @@ local PLUGINS = {
 
     {
         "folke/lazydev.nvim",
-        ft = "lua",     -- only load on lua files
+        ft = "lua", -- only load on lua files
         opts = {
             library = {
                 -- See the configuration section for more details
@@ -85,6 +85,8 @@ local PLUGINS = {
 
 
     -- LANG SPECIFIC
+
+    -- > RUST
     {
         'mrcjkb/rustaceanvim',
         version = '^5',
@@ -98,11 +100,23 @@ local PLUGINS = {
             vim.g.rustfmt_autosave = 1
         end
     },
+    -- > JAVA
+    { "mfussenegger/nvim-jdtls" },
+    {
+        "oclay1st/gradle.nvim",
+        cmd = { "Gradle", "GradleExec", "GradleInit" },
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "MunifTanjim/nui.nvim",
+        },
+        opts = {}, -- options, see default configuration
+        keys = { { "<Leader>G", "<cmd>Gradle<cr>", desc = "Gradle" } },
+    },
 
     -- OTHER
-    { 'RRethy/vim-illuminate' },                        -- highlights the same variable in different spots
-    { 'folke/which-key.nvim' },                         -- information on what keybindings exist
-    { 'echasnovski/mini.nvim',     version = '*' },     -- icons for which key
+    { 'RRethy/vim-illuminate' },                    -- highlights the same variable in different spots
+    { 'folke/which-key.nvim' },                     -- information on what keybindings exist
+    { 'echasnovski/mini.nvim', version = '*' },     -- icons for which key
 
     -- THEME
     { "EdenEast/nightfox.nvim" },
@@ -118,12 +132,15 @@ local PLUGINS = {
     'kristijanhusak/vim-dadbod-completion',
 
     -- JUPYTER NOTEBOOK
-    { "kiyoon/jupynium.nvim",         build = "pip3 install --user ." },
+    { "kiyoon/jupynium.nvim", build = "pip3 install --user ." },
 
     -- MARKDOWN PREVIEW
-    { "iamcco/markdown-preview.nvim", build = function() vim.fn["mkdp#util#install"]() end, },
-
-
+    {
+        "iamcco/markdown-preview.nvim",
+        build = function()
+            vim.fn["mkdp#util#install"]()
+        end,
+    },
 }
 
 require('lazy').setup(PLUGINS)
