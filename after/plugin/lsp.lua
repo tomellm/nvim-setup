@@ -199,13 +199,7 @@ function M.on_attach_no_format(client, bufnr)
     vim.b.lsp_buffer_set_up = 1
 end
 
-local nvim_lsp = require('lspconfig')
-nvim_lsp.pyright.setup({
-    on_attach = M.on_attach,
-    capabilities = M.capabilities,
-})
-
-nvim_lsp.jdtls.setup({
+vim.lsp.config("pyright", {
     on_attach = M.on_attach,
     capabilities = M.capabilities,
 })

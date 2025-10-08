@@ -4,7 +4,7 @@ require('mason-lspconfig').setup({
     automatic_installation = true,
     handlers = {
         function (server_name)
-            require('lspconfig')[server_name].setup({})
+            vim.lsp.config(server_name, {})
         end
     }
 })
