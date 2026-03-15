@@ -1,22 +1,16 @@
+local WIDE_HEIGHT = 40
+
+local cmp = require('cmp')
+local compare = cmp.config.compare
+
+local luasnip = require('luasnip')
+require("luasnip.loaders.from_vscode").lazy_load()
+
 local has_words_before = function()
     unpack = unpack or table.unpack
     local line, col = unpack(vim.api.nvim_win_get_cursor(0))
     return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
 end
-
-local luasnip = require('luasnip')
-
-vim.lsp.enable({
-    'ts_ls',
-    'eslint',
-    'lua_ls',
-    'pyright'
-})
-
-local cmp = require('cmp')
--- local cmp_select = { behavior = cmp.SelectBehavior.Select }
---------- Stuff for Jupyter Notebook plugin
---------- https://github.com/kiyoon/jupynium.nvim
 
 local get_ws = function(max, len)
     return (" "):rep(max - len)
@@ -39,12 +33,29 @@ local format = function(_, item)
     return item
 end
 
-local compare = cmp.config.compare
+--- Sets the background color of different buffer Types
+--- so that they blend in with the other code
+vim.api.nvim_create_autocmd("ColorScheme", {
+    callback = function()
+        vim.api.nvim_set_hl(0, "CmpNormal", { bg = "#161616" })
+        vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#161616" })
+        vim.api.nvim_set_hl(0, "FloatBorder", { bg = "#161616" })
+    end
+})
+
+vim.lsp.enable({
+    'ts_ls',
+    'eslint',
+    'lua_ls',
+    'pyright'
+})
+
 cmp.setup({
     sources = {
         { name = "jupynium", priority = 1000 }, -- consider higher priority than LSP
         { name = "nvim_lsp", priority = 100 },
         { name = 'luasnip' },
+        { name = "crates" },
         -- ...
     },
     snippet = {
@@ -53,8 +64,25 @@ cmp.setup({
         end,
     },
     window = {
-        completion = cmp.config.window.bordered(),
-        documentation = cmp.config.window.bordered(),
+        completion = {
+            border = "rounded",
+            --winhighlight = 'Normal:Pmenu,FloatBorder:Pmenu,CursorLine:PmenuSel,Search:None',
+            --winblend = vim.o.pumblend,
+            winhighlight = "Normal:CmpNormal",
+            scrolloff = 2,
+            col_offset = 0,
+            side_padding = 0,
+            scrollbar = true,
+        },
+        documentation = {
+            border = "rounded",
+            max_height = math.floor(WIDE_HEIGHT * (WIDE_HEIGHT / vim.o.lines)),
+            max_width = math.floor((WIDE_HEIGHT * 2) * (vim.o.columns / (WIDE_HEIGHT * 2 * 16 / 9))),
+            winhighlight = 'Normal:CmpNormal',
+            winblend = vim.o.pumblend,
+            col_offset = 0,
+            scrollbar = true,
+        },
     },
     mapping = cmp.mapping.preset.insert({
         ['<C-y>'] = cmp.mapping.confirm({ select = true }),
@@ -112,6 +140,9 @@ cmp.setup({
     }
 })
 
+--- The hover action that can be performed in normal mode over any item
+--- to show more information about that item. With this function it can
+--- be specialized for any different lsp depending on the filetype
 local hover_actions_action = function()
     if vim.bo.filetype == 'rust'
     then
@@ -131,24 +162,46 @@ local code_actions_action = function()
     end
 end
 
+local code_format_action = function()
+    if vim.bo.filetype == "java" then
+        require("jdtls").organize_imports()
+    end
+    vim.lsp.buf.format()
+end
+
+local all_diagnostics_action = function()
+    require('telescope.builtin').diagnostics({
+        sort_by = "severity",
+        -- entry_filter = function(entry)
+        --     -- entry.filename is an absolute path
+        --     return not string.match(entry.filename, "/Users/tomellm/.*")
+        -- end,
+    })
+end
+
+--- List of different configurations of keybinds to their actions
+--- allowing them to be added to both the actual vim.keymap set aswell
+--- as the which_key index
 local lsp_actions = {
-    { mode = 'n', cmd = 'K',            action = hover_actions_action,                          desc = 'LSP hover' },
-    { mode = 'n', cmd = '<leader>a',    action = code_actions_action,                           desc = 'definitions' },
-    { mode = 'n', cmd = '<leader>vws',  action = function() vim.lsp.buf.workspace_symbol() end, desc = 'asdfa' },
-    { mode = 'n', cmd = '<leader>vd',   action = function() vim.lsp.buf.open_float() end,       desc = 'sdfa' },
-    { mode = 'n', cmd = "üb",           action = function() vim.lsp.buf.goto_next() end,        desc = 'asdf' },
-    { mode = 'n', cmd = "+b",           action = function() vim.lsp.buf.goto_prev() end,        desc = 'sdf' },
-    { mode = "i", cmd = "<C-k>",        action = function() vim.lsp.buf.signature_help() end,   desc = 'LSP signature help' },
-    { mode = 'n', cmd = '<leader>gd',   action = '<cmd>Telescope lsp_definitions<CR>',          desc = 'definitions' },
-    { mode = 'n', cmd = '<leader>gD',   action = function() vim.lsp.buf.type_definition() end,  desc = 'type definition' },
-    { mode = 'n', cmd = '<leader>gL',   action = function() vim.lsp.buf.declaration() end,      desc = 'declaration' },
-    { mode = 'n', cmd = '<leader>gi',   action = '<cmd>Telescope lsp_implementations<CR>',      desc = 'implementations' },
-    { mode = 'n', cmd = '<leader>gr',   action = '<cmd>Telescope lsp_references<CR>',           desc = 'references float' },
-    { mode = "n", cmd = "<leader>grp",  action = function() vim.lsp.buf.references() end,       desc = 'references page' },
-    { mode = "n", cmd = "<leader>grt",  action = "<cmd>ReferencerToggle<CR>",                   desc = 'inline references toggle' },
-    { mode = 'n', cmd = '<leader>ca',   action = '<cmd>CodeActionMenu<CR>',                     desc = 'code actions' },
-    { mode = 'n', cmd = '<leader>cf',   action = '<cmd>Format<CR>',                             desc = 'format' },
-    { mode = 'n', cmd = '<leader>cr',   action = function() vim.lsp.buf.rename() end,           desc = 'rename variable' },
+    { mode = 'n', cmd = 'K',           action = hover_actions_action,                          desc = 'LSP hover' },
+    { mode = 'n', cmd = '<leader>a',   action = code_actions_action,                           desc = 'definitions' },
+    { mode = 'n', cmd = '<leader>f',   action = code_format_action,                            desc = 'format' },
+    { mode = 'n', cmd = '<leader>ee',  action = function() vim.diagnostic.open_float() end,    desc = 'open diagnostic float' },
+    { mode = 'n', cmd = '<leader>ea',  action = all_diagnostics_action,                        desc = 'open all diagnostics' },
+    { mode = 'n', cmd = '<leader>vws', action = function() vim.lsp.buf.workspace_symbol() end, desc = 'query workspace symbols' },
+    --{ mode = 'n', cmd = '<leader>vd',   action = function() vim.lsp.buf.open_float() end,       desc = 'sdfa' },
+    { mode = 'n', cmd = "üb",          action = function() vim.lsp.buf.goto_next() end,        desc = 'next buffer' },
+    { mode = 'n', cmd = "+b",          action = function() vim.lsp.buf.goto_prev() end,        desc = 'previous buffer' },
+    { mode = "i", cmd = "<C-k>",       action = function() vim.lsp.buf.signature_help() end,   desc = 'LSP signature help' },
+    { mode = 'n', cmd = '<leader>gd',  action = '<cmd>Telescope lsp_definitions<CR>',          desc = 'definitions' },
+    { mode = 'n', cmd = '<leader>gD',  action = function() vim.lsp.buf.type_definition() end,  desc = 'type definition' },
+    { mode = 'n', cmd = '<leader>gL',  action = function() vim.lsp.buf.declaration() end,      desc = 'declaration' },
+    { mode = 'n', cmd = '<leader>gi',  action = '<cmd>Telescope lsp_implementations<CR>',      desc = 'implementations' },
+    { mode = 'n', cmd = '<leader>gr',  action = '<cmd>Telescope lsp_references<CR>',           desc = 'references float' },
+    { mode = "n", cmd = "<leader>grp", action = function() vim.lsp.buf.references() end,       desc = 'references page' },
+    { mode = "n", cmd = "<leader>grt", action = "<cmd>ReferencerToggle<CR>",                   desc = 'inline references toggle' },
+    { mode = 'n', cmd = '<leader>ca',  action = '<cmd>CodeActionMenu<CR>',                     desc = 'code actions' },
+    { mode = 'n', cmd = '<leader>cr',  action = function() vim.lsp.buf.rename() end,           desc = 'rename variable' },
 }
 
 vim.api.nvim_create_autocmd('LspAttach', {

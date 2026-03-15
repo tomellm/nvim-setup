@@ -3,6 +3,6 @@ require('lazy').setup({
         { import = "tomellm.plugins" }
     },
 })
-
-vim.o.background = "dark" -- or "light" for light mode
 vim.cmd.colorscheme("carbonfox")
+vim.o.background = "dark" -- or "light" for light mode
+
