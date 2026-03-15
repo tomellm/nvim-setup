@@ -1,5 +1,3 @@
-local lsp = require("lsp-zero")
-
 local has_words_before = function()
     unpack = unpack or table.unpack
     local line, col = unpack(vim.api.nvim_win_get_cursor(0))
@@ -8,7 +6,7 @@ end
 
 local luasnip = require('luasnip')
 
-lsp.setup_servers({
+vim.lsp.enable({
     'ts_ls',
     'eslint',
     'lua_ls',
@@ -16,13 +14,9 @@ lsp.setup_servers({
 })
 
 local cmp = require('cmp')
-local cmp_action = require('lsp-zero').cmp_action()
 -- local cmp_select = { behavior = cmp.SelectBehavior.Select }
 --------- Stuff for Jupyter Notebook plugin
 --------- https://github.com/kiyoon/jupynium.nvim
-
-local compare = cmp.config.compare
-
 
 local get_ws = function(max, len)
     return (" "):rep(max - len)
@@ -45,6 +39,7 @@ local format = function(_, item)
     return item
 end
 
+local compare = cmp.config.compare
 cmp.setup({
     sources = {
         { name = "jupynium", priority = 1000 }, -- consider higher priority than LSP
@@ -64,8 +59,20 @@ cmp.setup({
     mapping = cmp.mapping.preset.insert({
         ['<C-y>'] = cmp.mapping.confirm({ select = true }),
         ['<C-Space>'] = cmp.mapping.complete(),
-        ['<C-f>'] = cmp_action.luasnip_jump_forward(),
-        ['<C-b>'] = cmp_action.luasnip_jump_backward(),
+        ['<C-f>'] = cmp.mapping(function(fallback)
+            if luasnip.jumpable(1) then
+                luasnip.jump(1)
+            else
+                fallback()
+            end
+        end, { 'i', 's' }),
+        ['<C-b>'] = cmp.mapping(function(fallback)
+            if luasnip.jumpable(-1) then
+                luasnip.jump(-1)
+            else
+                fallback()
+            end
+        end, { 'i', 's' }),
         ["<Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
                 cmp.select_next_item()
@@ -105,36 +112,55 @@ cmp.setup({
     }
 })
 
----------
+local hover_actions_action = function()
+    if vim.bo.filetype == 'rust'
+    then
+        vim.cmd.RustLsp { 'hover', 'actions' }
+    else
+        vim.lsp.buf.hover({
+            border = "rounded"
+        })
+    end
+end
 
---[[lsp.setup_nvim_cmp({
-    mapping = cmp_mappings
-})]]
-lsp.on_attach(function(client, bufnr)
-    lsp.default_keymaps({ buffer = bufnr })
+local code_actions_action = function()
+    if vim.bo.filetype == "rust" then
+        vim.cmd.RustLsp('codeAction')
+    else
+        vim.lsp.buf.code_action()
+    end
+end
 
-    local opts = { buffer = bufnr, remap = false }
+local lsp_actions = {
+    { mode = 'n', cmd = 'K',            action = hover_actions_action,                          desc = 'LSP hover' },
+    { mode = 'n', cmd = '<leader>a',    action = code_actions_action,                           desc = 'definitions' },
+    { mode = 'n', cmd = '<leader>vws',  action = function() vim.lsp.buf.workspace_symbol() end, desc = 'asdfa' },
+    { mode = 'n', cmd = '<leader>vd',   action = function() vim.lsp.buf.open_float() end,       desc = 'sdfa' },
+    { mode = 'n', cmd = "üb",           action = function() vim.lsp.buf.goto_next() end,        desc = 'asdf' },
+    { mode = 'n', cmd = "+b",           action = function() vim.lsp.buf.goto_prev() end,        desc = 'sdf' },
+    { mode = "i", cmd = "<C-k>",        action = function() vim.lsp.buf.signature_help() end,   desc = 'LSP signature help' },
+    { mode = 'n', cmd = '<leader>gd',   action = '<cmd>Telescope lsp_definitions<CR>',          desc = 'definitions' },
+    { mode = 'n', cmd = '<leader>gD',   action = function() vim.lsp.buf.type_definition() end,  desc = 'type definition' },
+    { mode = 'n', cmd = '<leader>gL',   action = function() vim.lsp.buf.declaration() end,      desc = 'declaration' },
+    { mode = 'n', cmd = '<leader>gi',   action = '<cmd>Telescope lsp_implementations<CR>',      desc = 'implementations' },
+    { mode = 'n', cmd = '<leader>gr',   action = '<cmd>Telescope lsp_references<CR>',           desc = 'references float' },
+    { mode = "n", cmd = "<leader>grp",  action = function() vim.lsp.buf.references() end,       desc = 'references page' },
+    { mode = "n", cmd = "<leader>grt",  action = "<cmd>ReferencerToggle<CR>",                   desc = 'inline references toggle' },
+    { mode = 'n', cmd = '<leader>ca',   action = '<cmd>CodeActionMenu<CR>',                     desc = 'code actions' },
+    { mode = 'n', cmd = '<leader>cf',   action = '<cmd>Format<CR>',                             desc = 'format' },
+    { mode = 'n', cmd = '<leader>cr',   action = function() vim.lsp.buf.rename() end,           desc = 'rename variable' },
+}
 
-    vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
-    vim.keymap.set("n", "K", function()
-        if vim.bo.filetype == 'rust'
-        then
-            vim.cmd.RustLsp { 'hover', 'actions' }
-        else
-            vim.lsp.buf.hover({
-                border = "rounded"
-            })
+vim.api.nvim_create_autocmd('LspAttach', {
+    callback = function(event)
+        local bufnr = event.buf
+        local opts = { buffer = bufnr, remap = false }
+
+        for _, mapping in ipairs(lsp_actions) do
+            vim.keymap.set(mapping.mode, mapping.cmd, mapping.action, opts)
         end
-    end, opts)
-    vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts)
-    vim.keymap.set("n", "<leader>vd", function() vim.lsp.buf.open_float() end, opts)
-    vim.keymap.set("n", "üb", function() vim.lsp.buf.goto_next() end, opts)
-    vim.keymap.set("n", "+b", function() vim.lsp.buf.goto_prev() end, opts)
-    vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
-    vim.keymap.set("n", "<leader>vrr", function() vim.lsp.buf.references() end, opts)
-    vim.keymap.set("n", "<leader>vrn", function() vim.lsp.buf.rename() end, opts)
-    vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
-end)
+    end
+})
 
 local M = {}
 
@@ -145,38 +171,17 @@ local illuminate = require('illuminate')
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 M.capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
-local function set_commands()
-    -- Commands.
-    -- See `:help vim.lsp.*` for documentation on any of the below functions
-    vim.cmd('command! LspDeclaration lua vim.lsp.buf.declaration()')
-    vim.cmd('command! LspDef lua vim.lsp.buf.definition()')
-    vim.cmd('command! LspFormatting lua vim.lsp.buf.formatting()')
-    vim.cmd('command! LspCodeAction lua vim.lsp.buf.code_action()')
-    vim.cmd('command! LspHover lua vim.lsp.buf.hover()')
-    vim.cmd('command! LspRename lua vim.lsp.buf.rename()')
-    vim.cmd('command! LspOrganize lua lsp_organize_imports()')
-    vim.cmd('command! LspRefs lua vim.lsp.buf.references()')
-    vim.cmd('command! LspTypeDef lua vim.lsp.buf.type_definition()')
-    vim.cmd('command! LspImplementation lua vim.lsp.buf.implementation()')
-    vim.cmd('command! LspSignatureHelp lua vim.lsp.buf.signature_help()')
-    vim.cmd('command! LspWorkspaceList lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))')
-    vim.cmd('command! LspWorkspaceAdd lua vim.lsp.buf.add_workspace_folder()')
-    vim.cmd('command! LspWorkspaceRemove lua vim.lsp.buf.remove_workspace_folder()')
-end
+vim.lsp.config('*', {
+    capabilities = M.capabilities,
+})
 
 local function set_keymaps()
-    wk.add({
-        { '<leader>gd', '<cmd>Telescope lsp_definitions<CR>',     desc = 'definitions' },
-        { '<leader>gD', '<cmd>LspTypeDef<CR>',                    desc = 'type definition' },
-        { '<leader>gL', '<cmd>LspDeclaration<CR>',                desc = 'declaration' },
-        { '<leader>gi', '<cmd>Telescope lsp_implementations<CR>', desc = 'implementations' },
-        { '<leader>gr', '<cmd>Telescope lsp_references<CR>',      desc = 'references' },
-        { '<leader>ca', '<cmd>CodeActionMenu<CR>',                desc = 'code actions' },
-        { '<leader>cf', '<cmd>Format<CR>',                        desc = 'format' },
-        { '<leader>cr', '<cmd>LspRename<CR>',                     desc = 'rename variable' },
-        { '<leader>K',  '<cmd>LspHover<CR>',                      desc = 'LSP hover' },
-        { '<C-S>',      '<cmd>LspSignatureHelp<CR>',              desc = 'LSP signature help', mode = 'i' },
-    })
+    local which_key_mappings = {}
+    for key, mapping in ipairs(lsp_actions) do
+        which_key_mappings[key] = { mapping.cmd, mapping.action, desc = mapping.desc, mode = mapping.mode }
+    end
+
+    wk.add(which_key_mappings)
 end
 
 function M.on_attach(client, bufnr)
@@ -190,9 +195,8 @@ function M.on_attach_no_format(client, bufnr)
     end
 
     --Enable completion triggered by <c-x><c-o>
-    vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+    -- vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-    set_commands()
     set_keymaps()
     illuminate.on_attach(client)
 
@@ -203,5 +207,3 @@ vim.lsp.config("pyright", {
     on_attach = M.on_attach,
     capabilities = M.capabilities,
 })
-
-lsp.setup()

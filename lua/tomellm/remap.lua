@@ -34,6 +34,9 @@ vim.keymap.set("v", "<leader>d", "\"_d")
 vim.keymap.set("n", "Q", "<nop>")
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
 vim.keymap.set("n", "<leader>f", function()
+    if vim.bo.filetype == "java" then
+        require("jdtls").organize_imports()
+    end
     vim.lsp.buf.format()
 end)
 
@@ -84,7 +87,13 @@ vim.keymap.set("n", "<leader>ee", function()
 end)
 
 vim.keymap.set("n", "<leader>ea", function()
-    require('telescope.builtin').diagnostics({ sort_by = "severity" })
+    require('telescope.builtin').diagnostics({
+        sort_by = "severity",
+        -- entry_filter = function(entry)
+        --     -- entry.filename is an absolute path
+        --     return not string.match(entry.filename, "/Users/tomellm/.*")
+        -- end,
+    })
 end)
 
 -- DB commandos
