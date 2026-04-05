@@ -140,6 +140,10 @@ cmp.setup({
     }
 })
 
+local border_rounded = {
+    border = "rounded"
+}
+
 --- The hover action that can be performed in normal mode over any item
 --- to show more information about that item. With this function it can
 --- be specialized for any different lsp depending on the filetype
@@ -148,9 +152,7 @@ local hover_actions_action = function()
     then
         vim.cmd.RustLsp { 'hover', 'actions' }
     else
-        vim.lsp.buf.hover({
-            border = "rounded"
-        })
+        vim.lsp.buf.hover(border_rounded)
     end
 end
 
@@ -158,7 +160,7 @@ local code_actions_action = function()
     if vim.bo.filetype == "rust" then
         vim.cmd.RustLsp('codeAction')
     else
-        vim.lsp.buf.code_action()
+        vim.lsp.buf.code_action(border_rounded)
     end
 end
 
@@ -186,7 +188,7 @@ local lsp_actions = {
     { mode = 'n', cmd = 'K',           action = hover_actions_action,                          desc = 'LSP hover' },
     { mode = 'n', cmd = '<leader>a',   action = code_actions_action,                           desc = 'definitions' },
     { mode = 'n', cmd = '<leader>f',   action = code_format_action,                            desc = 'format' },
-    { mode = 'n', cmd = '<leader>ee',  action = function() vim.diagnostic.open_float() end,    desc = 'open diagnostic float' },
+    { mode = 'n', cmd = '<leader>ee',  action = function() vim.diagnostic.open_float(border_rounded) end,    desc = 'open diagnostic float' },
     { mode = 'n', cmd = '<leader>ea',  action = all_diagnostics_action,                        desc = 'open all diagnostics' },
     { mode = 'n', cmd = '<leader>vws', action = function() vim.lsp.buf.workspace_symbol() end, desc = 'query workspace symbols' },
     --{ mode = 'n', cmd = '<leader>vd',   action = function() vim.lsp.buf.open_float() end,       desc = 'sdfa' },
@@ -198,8 +200,8 @@ local lsp_actions = {
     { mode = 'n', cmd = '<leader>gL',  action = function() vim.lsp.buf.declaration() end,      desc = 'declaration' },
     { mode = 'n', cmd = '<leader>gi',  action = '<cmd>Telescope lsp_implementations<CR>',      desc = 'implementations' },
     { mode = 'n', cmd = '<leader>gr',  action = '<cmd>Telescope lsp_references<CR>',           desc = 'references float' },
-    { mode = "n", cmd = "<leader>grp", action = function() vim.lsp.buf.references() end,       desc = 'references page' },
-    { mode = "n", cmd = "<leader>grt", action = "<cmd>ReferencerToggle<CR>",                   desc = 'inline references toggle' },
+    { mode = "n", cmd = "<leader>gp", action = function() vim.lsp.buf.references() end,       desc = 'references page' },
+    { mode = "n", cmd = "<leader>gt", action = "<cmd>ReferencerToggle<CR>",                   desc = 'inline references toggle' },
     { mode = 'n', cmd = '<leader>ca',  action = '<cmd>CodeActionMenu<CR>',                     desc = 'code actions' },
     { mode = 'n', cmd = '<leader>cr',  action = function() vim.lsp.buf.rename() end,           desc = 'rename variable' },
 }
