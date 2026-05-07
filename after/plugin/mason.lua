@@ -1,6 +1,11 @@
 require('mason').setup()
 require('mason-lspconfig').setup({
-    ensure_installed = { 'lua_ls'},
+    ensure_installed = {
+        'lua_ls',
+        'eslint',
+        'pyright',
+        'ts_ls'
+    },
     automatic_installation = true,
     handlers = {
         function (server_name)
@@ -8,5 +13,6 @@ require('mason-lspconfig').setup({
         end
     }
 })
+
 
 

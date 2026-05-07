@@ -10,21 +10,18 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 
-vim.keymap.set("n", "<leader>p", "\"_dP")
-vim.keymap.set("x", "<leader>p", "\"_dP")
+vim.keymap.set("n", "<leader>p", '"_dP')
+vim.keymap.set("x", "<leader>p", '"_dP')
 
+vim.keymap.set("n", "<leader>y", '"+y')
+vim.keymap.set("v", "<leader>y", '"+y')
+vim.keymap.set("n", "<leader>Y", '"+Y')
 
-vim.keymap.set("n", "<leader>y", "\"+y")
-vim.keymap.set("v", "<leader>y", "\"+y")
-vim.keymap.set("n", "<leader>Y", "\"+Y")
-
-
-vim.keymap.set("n", "<leader>d", "\"_d")
-vim.keymap.set("v", "<leader>d", "\"_d")
-
+vim.keymap.set("n", "<leader>d", '"_d')
+vim.keymap.set("v", "<leader>d", '"_d')
 
 vim.keymap.set("n", "Q", "<nop>")
-vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
+-- vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
 
 vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
 vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")
@@ -35,7 +32,7 @@ vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><
 vim.keymap.set("n", "<leader>+x", "<cmd>!chmod +x %<CR>", { silent = true })
 
 vim.keymap.set("n", "<leader><leader>", function()
-    vim.cmd("so")
+	vim.cmd("so")
 end)
 
 -- buffer management
@@ -69,7 +66,6 @@ vim.keymap.set("n", "<leader>tp", "<cmd>tabprevious<CR>")
 
 -- DB commandos
 
-
 -- Greek letters
 
 vim.keymap.set("i", "<C-g>g", "<C-k>g*") -- gamma
@@ -86,6 +82,5 @@ vim.keymap.set("i", "<C-g>e", "<C-k>e*") -- epsilon
 vim.keymap.set("i", "<C-g>l", "<C-k>l*") -- lambda
 vim.keymap.set("i", "<C-g>t", "<C-k>t*") -- tau
 
-
 -- count words
-vim.keymap.set("n", "<leader>crl", "<cmd>!find . -name '*.rs' -type f -exec wc -l {} +<CR>")
+--vim.keymap.set("n", "<leader>crl", "<cmd>!find . -name '*.rs' -type f -exec wc -l {} +<CR>")

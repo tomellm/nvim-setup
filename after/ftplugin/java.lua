@@ -14,17 +14,17 @@ local writable_config_dir = jdtls_base .. "/libexec/config_mac/"
 -- Get DAP bundles for debugging (optional but recommended)
 local bundles = {}
 local java_debug_path = vim.fn.glob(
-    home
-    .. "/.local/share/nvim/mason/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar"
+	home
+		.. "/.local/share/nvim/mason/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar"
 )
 if java_debug_path ~= "" then
-    table.insert(bundles, java_debug_path)
+	table.insert(bundles, java_debug_path)
 end
 
 -- Debug: Check if paths exist
 if launcher_path == "" or jdtls_base == "" then
-    vim.notify("JDTLS not found. Check your installation.", vim.log.levels.ERROR)
-    return
+	vim.notify("JDTLS not found. Check your installation.", vim.log.levels.ERROR)
+	return
 end
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -34,156 +34,185 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 -- end
 
 local on_attach = function(client, bufnr)
-    local opts = { buffer = bufnr }
+	local opts = { buffer = bufnr }
 
-    -- Enable code lens
-    vim.lsp.codelens.refresh()
-    vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
-        buffer = bufnr,
-        callback = function()
-            vim.lsp.codelens.refresh()
-        end,
-    })
+	-- Enable code lens
+	-- vim.lsp.codelens.refresh()
+	-- vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
+	--     buffer = bufnr,
+	--     callback = function()
+	--         vim.lsp.codelens.refresh()
+	--     end,
+	-- })
 
-    vim.keymap.set(
-        "n",
-        "<leader>oi",
-        require("jdtls").organize_imports,
-        vim.tbl_extend("force", opts, { desc = "Organize imports" })
-    )
-    vim.keymap.set(
-        "v",
-        "<leader>ev",
-        require("jdtls").extract_variable,
-        vim.tbl_extend("force", opts, { desc = "Extract variable" })
-    )
-    vim.keymap.set(
-        "v",
-        "<leader>em",
-        require("jdtls").extract_method,
-        vim.tbl_extend("force", opts, { desc = "Extract method" })
-    )
-    vim.keymap.set(
-        "n",
-        "<leader>tc",
-        require("jdtls").test_class,
-        vim.tbl_extend("force", opts, { desc = "Test class" })
-    )
-    vim.keymap.set(
-        "n",
-        "<leader>tm",
-        require("jdtls").test_nearest_method,
-        vim.tbl_extend("force", opts, { desc = "Test method" })
-    )
+	vim.keymap.set(
+		"n",
+		"<leader>oi",
+		require("jdtls").organize_imports,
+		vim.tbl_extend("force", opts, { desc = "Organize imports" })
+	)
+	vim.keymap.set(
+		"v",
+		"<leader>ev",
+		require("jdtls").extract_variable,
+		vim.tbl_extend("force", opts, { desc = "Extract variable" })
+	)
+	vim.keymap.set(
+		"v",
+		"<leader>em",
+		require("jdtls").extract_method,
+		vim.tbl_extend("force", opts, { desc = "Extract method" })
+	)
+	vim.keymap.set(
+		"n",
+		"<leader>tc",
+		require("jdtls").test_class,
+		vim.tbl_extend("force", opts, { desc = "Test class" })
+	)
+	vim.keymap.set(
+		"n",
+		"<leader>tm",
+		require("jdtls").test_nearest_method,
+		vim.tbl_extend("force", opts, { desc = "Test method" })
+	)
 end
 
 -- Extended DAP configuration
 local extendedClientCapabilities = jdtls.extendedClientCapabilities
 extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
 
+-- Tries to recursively find the furthest pom.xml and if it doesn't find any
+-- defaults to the standard root finding method
+local function find_root()
+	local current = vim.fn.expand("%:p:h") -- start from current file's directory
+	local last_pom_dir = nil
+
+	-- Walk up the directory tree
+	local path = current
+	while true do
+		if vim.fn.filereadable(path .. "/pom.xml") == 1 then
+			last_pom_dir = path -- keep updating, so we end up at the topmost pom.xml
+		else
+			break
+		end
+		local parent = vim.fn.fnamemodify(path, ":h")
+		if parent == path then
+			break
+		end -- reached filesystem root
+		path = parent
+	end
+
+	return last_pom_dir
+		or require("jdtls.setup").find_root({
+			".git",
+			"gradlew",
+			"settings.gradle.kts",
+			"settings.gradle",
+		})
+end
+
+local root = find_root()
+
+-- activate if you need to debug the java root path
+-- vim.notify("JDTLS root: " .. (root or "NOT FOUND"))
+
 local config = {
-    cmd = {
-        "java",
-        "-Declipse.application=org.eclipse.jdt.ls.core.id1",
-        "-Dosgi.bundles.defaultStartLevel=4",
-        "-Declipse.product=org.eclipse.jdt.ls.core.product",
-        "-Dlog.protocol=true",
-        "-Dlog.level=ALL",
-        "-Xms1g",
-        "-Xmx2g",
-        "--add-modules=ALL-SYSTEM",
-        "--add-opens",
-        "java.base/java.util=ALL-UNNAMED",
-        "--add-opens",
-        "java.base/java.lang=ALL-UNNAMED",
-        "-jar",
-        launcher_path,
-        "-configuration",
-        writable_config_dir,
-        "-data",
-        workspace_dir,
-    },
-    root_dir = require("jdtls.setup").find_root({
-        ".git",
-        "mvnw",
-        "gradlew",
-        "pom.xml",
-        "settings.gradle.kts",
-        "settings.gradle"
-    }),
-    capabilities = capabilities,
-    on_attach = on_attach,
-    settings = {
-        java = {
-            eclipse = {
-                downloadSources = true,
-            },
-            configuration = {
-                updateBuildConfiguration = "interactive",
-            },
-            maven = {
-                downloadSources = true,
-            },
-            implementationsCodeLens = {
-                enabled = true,
-            },
-            referencesCodeLens = {
-                enabled = true,
-            },
-            references = {
-                includeDecompiledSources = true,
-            },
-            format = {
-                enabled = true,
-            },
-            signatureHelp = { enabled = true },
-            contentProvider = { preferred = "fernflower" },
-            completion = {
-                favoriteStaticMembers = {
-                    "org.hamcrest.MatcherAssert.assertThat",
-                    "org.hamcrest.Matchers.*",
-                    "org.hamcrest.CoreMatchers.*",
-                    "org.junit.jupiter.api.Assertions.*",
-                    "java.util.Objects.requireNonNull",
-                    "java.util.Objects.requireNonNullElse",
-                    "org.mockito.Mockito.*",
-                },
-                importOrder = {
-                    "java",
-                    "javax",
-                    "org",
-                    "com",
-                },
-            },
-            sources = {
-                organizeImports = {
-                    starThreshold = 9999,
-                    staticStarThreshold = 9999,
-                },
-            },
-            codeGeneration = {
-                toString = {
-                    template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}",
-                },
-                useBlocks = true,
-            },
-            saveActions = {
-                organizeImports = true,
-            }
-        },
-    },
-    flags = {
-        allow_incremental_sync = true,
-    },
-    init_options = {
-        bundles = bundles,
-        extendedClientCapabilities = extendedClientCapabilities,
-        settings = {
-            java = {
-                implementationsCodeLens = { enabled = true },
-            }
-        },
-    },
+	cmd = {
+		"java",
+		"-Declipse.application=org.eclipse.jdt.ls.core.id1",
+		"-Dosgi.bundles.defaultStartLevel=4",
+		"-Declipse.product=org.eclipse.jdt.ls.core.product",
+		"-Dlog.protocol=true",
+		"-Dlog.level=ALL",
+		"-Xms1g",
+		"--add-modules=ALL-SYSTEM",
+		"--add-opens",
+		"java.base/java.util=ALL-UNNAMED",
+		"--add-opens",
+		"java.base/java.lang=ALL-UNNAMED",
+		"-javaagent:" .. home .. "/.local/share/java-jars/lombok.jar",
+		"-jar",
+		launcher_path,
+		"-configuration",
+		writable_config_dir,
+		"-data",
+		workspace_dir,
+	},
+	root_dir = root,
+	capabilities = capabilities,
+	on_attach = on_attach,
+	settings = {
+		java = {
+			eclipse = {
+				downloadSources = true,
+			},
+			configuration = {
+				updateBuildConfiguration = "interactive",
+			},
+			maven = {
+				downloadSources = true,
+			},
+			implementationsCodeLens = {
+				enabled = true,
+			},
+			referencesCodeLens = {
+				enabled = true,
+			},
+			references = {
+				includeDecompiledSources = true,
+			},
+			format = {
+				enabled = true,
+			},
+			signatureHelp = { enabled = true },
+			contentProvider = { preferred = "fernflower" },
+			completion = {
+				favoriteStaticMembers = {
+					"org.hamcrest.MatcherAssert.assertThat",
+					"org.hamcrest.Matchers.*",
+					"org.hamcrest.CoreMatchers.*",
+					"org.junit.jupiter.api.Assertions.*",
+					"java.util.Objects.requireNonNull",
+					"java.util.Objects.requireNonNullElse",
+					"org.mockito.Mockito.*",
+				},
+				importOrder = {
+					"java",
+					"javax",
+					"org",
+					"com",
+				},
+			},
+			sources = {
+				organizeImports = {
+					starThreshold = 9999,
+					staticStarThreshold = 9999,
+				},
+			},
+			codeGeneration = {
+				toString = {
+					template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}",
+				},
+				useBlocks = true,
+			},
+			saveActions = {
+				organizeImports = true,
+			},
+			extendedClientCapabilities = extendedClientCapabilities,
+		},
+	},
+	flags = {
+		allow_incremental_sync = true,
+	},
+	init_options = {
+		bundles = bundles,
+		extendedClientCapabilities = extendedClientCapabilities,
+		settings = {
+			java = {
+				implementationsCodeLens = { enabled = true },
+			},
+		},
+	},
 }
 
-require('jdtls').start_or_attach(config)
+require("jdtls").start_or_attach(config)
